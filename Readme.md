@@ -1,14 +1,15 @@
 This repository contains a load performance test for Empirica v1.
 
 It is composed of:
-- server: an minimal Empirica app streamlined for easier automation
-- client: a [puppeteer](https://github.com/GoogleChrome/puppeteer) script
-  to automate X player bots running through the experiment concurrently.
 
-The client is quite basic, and just opens X headless Chrome windows in puppeteer,
-and sequencialy goes between the windows to move the player bot forward in the
-game steps. It cannot handle complex situations, but can currently move onto
-the next game once their current game ends or is cancelled.
+- server: an minimal Empirica app streamlined for easier automation
+- client: a [puppeteer](https://github.com/GoogleChrome/puppeteer) script to
+  automate X player bots running through the experiment concurrently.
+
+The client is quite basic, and just opens X headless Chrome windows in
+puppeteer, and sequencialy goes between the windows to move the player bot
+forward in the game steps. It cannot handle complex situations, but can
+currently move onto the next game once their current game ends or is cancelled.
 
 To run the server, install Docker and Docker Compose on the machine you wish to
 test. Then copy the `docker-compose.yml` file at the root of this repo to that
@@ -36,7 +37,39 @@ this value is of 20s, which means if we have 10 players, we will wait 2s between
 each player bot submnitting their round. This delay allows for the game to not
 go too fast. Each round should last more or less 20s. But this is only if the
 players are sequencially playing the same game, which might not be the case, if
-for example you have 100 players playing 10 games concurrently. Although,
-if you have 100 player bots, each player bot should play within 200ms (more or
-less, there's definitely latency), so the 10 games should be more or less in
-sync.
+for example you have 100 players playing 10 games concurrently. Although, if you
+have 100 player bots, each player bot should play within 200ms (more or less,
+there's definitely latency), so the 10 games should be more or less in sync.
+
+UPDATE: to run in parralel, you can run the docker-conpose.yml file in the
+/client dir. For example:
+
+```sh
+export SERVER_ADDR=123.123.123.123
+sudo -E docker-compose up --scale app=9
+```
+
+Will run 9 times the client script, each script is configured (by default) to
+have 11 players (99 total, usually nice to be one manual player testing it at
+the same time). This does alleviate some of the latency.
+
+### Experiment notes
+
+Server: z1d.large 2 cores 16GB Client: t3a.xlarge 4 cores 16GB
+
+#### Setup machine:
+
+AMI: Ubuntu 18
+https://www.digitalocean.com/community/tutorials/how-to-install-and-use-docker-on-ubuntu-18-04
+sudo apt update sudo apt install apt-transport-https ca-certificates curl
+software-properties-common curl -fsSL
+https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add - sudo
+add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu
+bionic stable" sudo apt update sudo apt install docker-ce sudo systemctl status
+docker
+
+https://www.digitalocean.com/community/tutorials/how-to-install-docker-compose-on-ubuntu-18-04
+sudo curl -L
+https://github.com/docker/compose/releases/download/1.21.2/docker-compose-`uname
+-s`-`uname -m` -o /usr/local/bin/docker-compose sudo chmod +x
+/usr/local/bin/docker-compose docker-compose --version
