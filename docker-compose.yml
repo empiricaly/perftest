@@ -17,4 +17,7 @@ services:
     command:
       - --storageEngine=wiredTiger
     volumes:
-      - data:/var/data/db
+      - data:/data/db
+
+volumes:
+  data:

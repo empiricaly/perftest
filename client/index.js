@@ -6,6 +6,7 @@ const arg1 = args[0];
 const isHelp = arg1 === "-h" || arg1 === "--help";
 const addr = args[0];
 const numTabs = parseInt(args[1], 10);
+const delay = args[2] ? parseInt(args[2], 10) : 20;
 
 if (!isHelp) {
   if (!addr) {
@@ -40,9 +41,9 @@ Examples:
   process.exit(isHelp ? 0 : 1);
 }
 
-console.log(`Testing http://${addr} with ${numTabs} players.`);
-
-process.exit(0);
+console.log(
+  `Testing http://${addr} with ${numTabs} players, on a ${delay}s loop.`
+);
 
 function sleep(time) {
   return new Promise(function(resolve) {
@@ -115,7 +116,7 @@ function sleep(time) {
           });
 
           // Wait randomly between 10 and 30s before submitting
-          sleep((Math.random() * 20 * 1000) / numTabs);
+          sleep((delay * 1000) / numTabs);
 
           await page.click(".task-response button");
         } else {
